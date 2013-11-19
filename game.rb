@@ -10,17 +10,35 @@ class Game
 		@players.each_index{|i| players[i] = Player.new(i)}
 	end
 
-	def dealToPlayer(playerId)
+	def dealToPlayer(playerId, handId=0)
 		# TODO: what if deck is empty?
-		@players[playerId].hand.add(@deck.getCard)
+		@players[playerId].hands[handId].add(@deck.getCard)
 	end
 
 	def deal
 		# TODO: What if deck is empty? We need to check
-		@players.each{|x| x.hand.add(@deck.getCard)}
+		@players.each {|x| x.hands.each {|y| y.add(@deck.getCard)}}
 	end
 
 	def hit(playerId)
+		dealToPlayer(playerId)
+	end
+
+	def splitHand(playerId, handId=0)
+		player = @players[playerId]
+		playerHand = player.hands[handId]
+
+		if playerHand.size == 2
+			card1 = playerHand.cards[0]
+			card2 = playerHand.cards[1]
+			if card1.rank == card2.rank or (card1.values.include?(10) and card2.values.include?(10))
+				playerNewHand = PlayerHand.new
+				playerHand.remove(card2)
+				playerNewHand.add(card2)
+				player.hands << playerNewHand
+			end
+		end
+
 	end
 
 	attr_reader :players

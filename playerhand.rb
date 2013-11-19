@@ -1,35 +1,41 @@
 require_relative "exceptions"
-require "ostruct"
+require "set"
 
 class PlayerHand
 	def initialize
-		@hand = Array.new
-		@possibleValues = [0]
+		@cards = Array.new
+		@possibleValues = Set.new [0]
 	end
 
 	def add(card)
-		@hand << card
+		@cards << card
 		@possibleValues = self.calculatePossibleVals
-		unless @possibleValues.any? { |val| val <= 21}
-			raise ValuesOver21Error(@possibleValues)
-		end
+	end
+
+	def remove(card)
+		@cards.delete(card)
+		@possibleValues = self.calculatePossibleVals
 	end
 
 	def calculatePossibleVals
-		# All possible combinations of card values in this hand
-		# See http://stackoverflow.com/questions/5226895/combine-array-of-array-into-all-possible-combinations-forward-only-in-ruby
-		valueCombos = @hand.first.values.product(*@hand[1..-1])
-		possibleVals = Array.new
-		# All possible values of a hand
-		valueCombos.each{|x| possibleVals << x.reduce(:+)} 
-		return possibleVals
+		if @cards.length > 0
+			# All possible combinations of card values in this hand
+			# See http://stackoverflow.com/questions/5226895/combine-array-of-array-into-all-possible-combinations-forward-only-in-ruby
+			valueCombos = @cards.first.values.product(*(@cards[1..-1].collect{|x| x.values}))
+			possibleVals = Set.new
+			# All possible values of a hand
+			valueCombos.each{|x| possibleVals << x.reduce(:+)} 
+			return possibleVals
+		else
+			return [0].to_set
+		end
 	end
 
 
 	def size
-		return @hand.length
+		return @cards.length
 	end
 
 	attr_reader :possibleValues
-	attr_reader :hand
+	attr_reader :cards
 end

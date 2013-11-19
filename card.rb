@@ -10,4 +10,6 @@ class Card
 	end
 
 	attr_reader :values
+	attr_reader :rank
+	attr_reader :suite
 end
