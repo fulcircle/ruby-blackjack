@@ -3,9 +3,11 @@ require_relative "deck"
 require_relative "exceptions"
 
 class Game
-	def initialize(numPlayers=1)
+	def initialize(numPlayers=1, minBet=1)
 		@deck = Deck.new
 		@deck.shuffle
+
+		@minBet = minBet
 
 		@players = Array.new(numPlayers)
 		@players.each_index{|i| players[i] = Player.new(i)}
@@ -23,6 +25,7 @@ class Game
 			self.dealToDealer
 			@players.each {|player| self.dealToPlayer(player, player.hands.first)}
 		end
+		@dealer.hands.first.cards.first.hidden = true
 
 	end
 
@@ -77,14 +80,18 @@ class Game
 		if playerHand.size == 2
 			card1 = playerHand.cards[0]
 			card2 = playerHand.cards[1]
-			if card1.rank == card2.rank or (card1.values.include?(10) and card2.values.include?(10))
+			# if card1.rank == card2.rank or (card1.values.include?(10) and card2.values.include?(10))
 				playerNewHand = PlayerHand.new
 				playerHand.remove(card2)
 				playerNewHand.add(card2)
 				player.hands << playerNewHand
-			else
-				raise CannotSplitError.new({:player=>player, :hand=>playerHand}), "You cannot split this hand"
-			end
+				self.dealToPlayer(player, playerHand)
+				self.dealToPlayer(player, playerNewHand)
+				playerHand.bet = playerHand.bet*0.5
+				playerNewHand.bet = playerHand.bet
+			# else
+				# raise CannotSplitError.new({:player=>player, :hand=>playerHand}), "You cannot split this hand"
+			# end
 		else
 			raise CannotSplitError.new({:player=>player, :hand=>playerHand}), "You cannot split this hand"
 		end
@@ -100,9 +107,27 @@ class Game
 		end
 	end
 
+	def placeBet(player, bet_amount, playerHand=nil)
+		if playerHand.nil?
+			playerHand = player.hands.first
+		end
+		if bet_amount < @minBet
+			raise MinBetError.new({:player=>player, :hand=>playerHand, :min_bet=>@minBet, :bet_amount=>bet_amount}), \
+				"The bet you placed is less than then minimum bet"
+		elsif bet_amount > player.score
+			raise NoMoneysError.new({:player=>player, :hand=>playerHand, :bet_amount=>bet_amount}), \
+				"You cannot bet that much.  Your wallet won't let you."
+		end
+		playerHand.bet = bet_amount
+		player.score -= bet_amount
+
+	end
+
 	attr_reader :players
 	attr_reader :dealer
+	attr_reader :currPlayerIndex
 	attr_reader :currPlayer
+	attr_reader :currHandIndex
 	attr_reader :currHand
 
 end

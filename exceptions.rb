@@ -17,3 +17,9 @@ end
 
 class NoMoreHandsError < GameError
 end
+
+class MinBetError < GameError
+end
+
+class NoMoneysError < GameError
+end

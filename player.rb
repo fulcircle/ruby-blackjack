@@ -30,7 +30,7 @@ class Player
 	attr_reader :hands
 	attr_reader :name
 	attr_reader :id
-	attr_reader :score
+	attr_accessor :score
 	attr_reader :isDoublingDown
 end
 

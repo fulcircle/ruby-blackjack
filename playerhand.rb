@@ -36,13 +36,6 @@ class PlayerHand
 		return @cards.to_s
 	end
 
-	def to_s_hide_hold_card
-		@cards.each_index {
-			|i| if i {put @cards[i]+  ", "}
-		}
-	end
-
-
 	def size
 		return @cards.length
 	end
