@@ -5,6 +5,7 @@ class PlayerHand
 	def initialize
 		@cards = Array.new
 		@possibleValues = Set.new [0]
+		@bet = 0
 	end
 
 	def add(card)
@@ -31,6 +32,16 @@ class PlayerHand
 		end
 	end
 
+	def to_s
+		return @cards.to_s
+	end
+
+	def to_s_hide_hold_card
+		@cards.each_index {
+			|i| if i {put @cards[i]+  ", "}
+		}
+	end
+
 
 	def size
 		return @cards.length
@@ -38,4 +49,5 @@ class PlayerHand
 
 	attr_reader :possibleValues
 	attr_reader :cards
+	attr_accessor :bet
 end

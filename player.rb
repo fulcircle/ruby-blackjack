@@ -3,13 +3,27 @@ require_relative "playerhand"
 class Player
 	def initialize(id, name="")
 		@id = id
-		@name = name.empty? ? "Player" + @id.to_s : name
+		@name = name.empty? ? "Player" + (@id+1).to_s : name
 		@hands = [PlayerHand.new]
 		@score = 1000
+		@isDoublingDown = false
 	end
 
 	def addHand
 		@hands << PlayerHand.new
+	end
+
+	def doubleDown
+		@hands.first.bet *= 2
+		@isDoublingDown = true
+	end
+
+	def numHands
+		return @hands.length
+	end
+
+	def to_s
+		return @name
 	end
 
 
@@ -17,4 +31,19 @@ class Player
 	attr_reader :name
 	attr_reader :id
 	attr_reader :score
+	attr_reader :isDoublingDown
+end
+
+class Dealer < Player
+
+	def initialize(id, name="")
+		super
+		@name = "Dealer"
+	end
+
+	def addHand
+	end
+
+	def doubleDown
+	end
 end

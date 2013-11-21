@@ -1,12 +1,15 @@
 require "test/unit"
 require_relative "game"
 require_relative "playerhand"
+require_relative "exceptions"
 
 class TestGame < Test::Unit::TestCase
 
 	def setup
 		@g = Game.new(2)
 		@deck = @g.instance_variable_get("@deck")
+		@player1 = @g.players[0]
+		@player2 = @g.players[1]
 	end
 
 	def test_game_creates_deck
@@ -20,61 +23,68 @@ class TestGame < Test::Unit::TestCase
 		assert_equal(2, @g.players.length)
 	end
 
-	def test_game_deals_cards
-		@g.deal
-		assert_equal(50, @deck.size)
-		assert_equal(1, @g.players[0].hands.first.size)
-		assert_equal(1, @g.players[1].hands.first.size)
-		assert_not_equal(@g.players[0].hands.first.cards[0], @g.players[1].hands.first.cards[0])
+	def test_game_deals_cards_on_game_start
+		@g.start
+		assert_equal(2, @player1.hands.first.size)
+		assert_equal(2, @player2.hands.first.size)
+		assert_equal(2, @g.dealer.hands.first.size)
 	end
+
+	# def test_game_deals_cards
+	# 	@g.deal
+	# 	assert_equal(50, @deck.size)
+	# 	assert_equal(1, @player1.hands.first.size)
+	# 	assert_equal(1, @player2.hands.first.size)
+	# 	assert_not_equal(@player1.hands.first.cards[0], @player2.hands.first.cards[0])
+	# end
 
 	def test_game_deals_card_to_player
-		@g.dealToPlayer(1)
+		@g.dealToPlayer(@player2, @player2.hands.first)
 		assert_equal(51, @deck.size)
-		assert_equal(1, @g.players[1].hands.first.size)
-		assert_equal(0, @g.players[0].hands.first.size)
+		assert_equal(1, @player2.hands.first.size)
+		assert_equal(0, @player1.hands.first.size)
 
-		@g.dealToPlayer(0)
+		@g.dealToPlayer(@player1, @player1.hands.first)
 		assert_equal(50, @deck.size)
-		assert_equal(1, @g.players[1].hands.first.size)
-		assert_equal(1, @g.players[0].hands.first.size)
+		assert_equal(1, @player2.hands.first.size)
+		assert_equal(1, @player1.hands.first.size)
 	end
 
-	def test_game_deals_card_on_hit
-		@g.hit(1)
-		assert_equal(51, @deck.size)
-		assert_equal(1, @g.players[1].hands.first.size)
-		assert_equal(0, @g.players[0].hands.first.size)
+	# def test_game_deals_card_on_hit
+	# 	@g.hit(@player2)
+	# 	assert_equal(51, @deck.size)
+	# 	assert_equal(1, @player2.hands.first.size)
+	# 	assert_equal(0, @player1.hands.first.size)
 
-		@g.hit(0)
-		assert_equal(50, @deck.size)
-		assert_equal(1, @g.players[1].hands.first.size)
-		assert_equal(1, @g.players[0].hands.first.size)
-	end
+	# 	@g.hit(@player1)
+	# 	assert_equal(50, @deck.size)
+	# 	assert_equal(1, @player2.hands.first.size)
+	# 	assert_equal(1, @player1.hands.first.size)
+	# end
 
-	def test_game_deals_to_all_hands
-		@g.players.first.addHand
-		@g.deal
-		assert_equal(49, @deck.size)
-		assert_equal(1, @g.players[0].hands[0].size)
-		assert_equal(1, @g.players[0].hands[1].size)
+	# def test_game_deals_to_all_hands
+	# 	@player1.addHand
+	# 	@g.deal
+	# 	assert_equal(49, @deck.size)
+	# 	assert_equal(1, @player1.hands[0].size)
+	# 	assert_equal(1, @player1.hands[1].size)
 
-		assert_equal(1, @g.players[1].hands.first.size)
-	end
+	# 	assert_equal(1, @player2.hands.first.size)
+	# end
 
 	def test_game_deals_to_one_hand
-		@g.players.first.addHand
-		@g.dealToPlayer(0, 1)
+		@player1.addHand
+		@g.dealToPlayer(@player1, @player1.hands[1])
 		assert_equal(51, @deck.size)
-		assert_equal(0, @g.players[0].hands[0].size)
-		assert_equal(1, @g.players[0].hands[1].size)
+		assert_equal(0, @player1.hands[0].size)
+		assert_equal(1, @player1.hands[1].size)
 
-		assert_equal(0, @g.players[1].hands.first.size)
+		assert_equal(0, @player2.hands.first.size)
 	end
 
 	def test_game_splits_hand_on_same_rank
 		# make sure first player has only 1 hand
-		player = @g.players.first
+		player = @player1
 		assert_equal(1, player.hands.size)
 		card1 = Card.new("Ace", "Clubs", [1,11])
 		card2 = Card.new("Ace", "Spades", [1,11])
@@ -82,7 +92,7 @@ class TestGame < Test::Unit::TestCase
 		playerFirstHand.add(card1)
 		playerFirstHand.add(card2)
 
-		@g.splitHand(0)
+		@g.splitHand(player)
 		assert_equal(2, player.hands.size)
 		assert_equal(1, player.hands[0].size)
 		assert_equal(1, player.hands[1].size)
@@ -95,7 +105,7 @@ class TestGame < Test::Unit::TestCase
 
 	def test_game_splits_hand_on_value_of_ten
 		# make sure first player has only 1 hand
-		player = @g.players.first
+		player = @player1
 		assert_equal(1, player.hands.size)
 		card1 = Card.new("King", "Clubs", [10])
 		card2 = Card.new("Jack", "Spades", [10])
@@ -103,7 +113,7 @@ class TestGame < Test::Unit::TestCase
 		playerFirstHand.add(card1)
 		playerFirstHand.add(card2)
 
-		@g.splitHand(0)
+		@g.splitHand(player)
 		assert_equal(2, player.hands.size)
 		assert_equal(1, player.hands[0].size)
 		assert_equal(1, player.hands[1].size)
@@ -116,13 +126,14 @@ class TestGame < Test::Unit::TestCase
 
 	def test_game_does_not_split_if_hand_size_not_2
 		# make sure first player has only 1 hand
-		player = @g.players.first
+		player = @player1
 		assert_equal(1, player.hands.size)
 		card1 = Card.new("King", "Clubs", [10])
 		playerFirstHand = player.hands.first
 		playerFirstHand.add(card1)
 
-		@g.splitHand(0)
+		assert_raise(CannotSplitError) {@g.splitHand(player)}
+
 		# Shouldn't split if only 1 card
 		assert_equal(1, player.hands.size)
 		assert_equal(1, player.hands[0].size)
@@ -135,7 +146,7 @@ class TestGame < Test::Unit::TestCase
 		playerFirstHand.add(card2)
 		playerFirstHand.add(card3)
 
-		@g.splitHand(0)
+		assert_raise(CannotSplitError) {@g.splitHand(player)}
 
 		# Shouldn't split if more than 2 cards
 		assert_equal(1, player.hands.size)
@@ -144,7 +155,7 @@ class TestGame < Test::Unit::TestCase
 
 	def test_game_does_not_split_if_hand_is_not_two_tens
 		# make sure first player has only 1 hand
-		player = @g.players.first
+		player = @player1
 		assert_equal(1, player.hands.size)
 
 		card1 = Card.new("King", "Clubs", [10])
@@ -154,17 +165,37 @@ class TestGame < Test::Unit::TestCase
 		playerFirstHand.add(card2)
 
 
-		@g.splitHand(0)
+		assert_raise(CannotSplitError) {@g.splitHand(player)}
 		# Shouldn't split if hand is not a pair of 10s
 		assert_equal(1, player.hands.size)
 		assert_equal(2, player.hands[0].size)
 
 	end
 
+	def test_game_raises_error_if_hand_value_over_21
+		player = @player1
+
+		card1 = Card.new("King", "Clubs", [10])
+		card2 = Card.new("Queen", "Spades", [10])
+		card3 = Card.new("Jack", "Diamonds", [10])
+
+		playerHand = player.hands.first
+
+		playerHand.add(card1)
+		playerHand.add(card2)
+		playerHand.add(card3)
+
+		assert_raise(ValueOver21Error) {@g.dealToPlayer(player,playerHand)}
+	end
+
+	def test_game_does_not_raise_error_if_hand_value_below_21
+		@g.dealToPlayer(@player1,@player1.hands.first)
+	end
+
 end
 
 class TestPlayerHand < Test::Unit::TestCase
-	def test_possible_values_calculation
+	def test_add_card_to_hand
 		hand = PlayerHand.new
 		# Test empty hand returns a set with value 0
 		assert_equal([0].to_set, hand.possibleValues)
@@ -192,5 +223,6 @@ class TestPlayerHand < Test::Unit::TestCase
 
 		assert_equal(1, hand.size)
 		assert_equal(hand.cards.first, card2)
+		assert_equal([1,11].to_set, hand.possibleValues)
 	end
 end

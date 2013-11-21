@@ -1,11 +1,19 @@
-class ValueOver21Error < Exception
-	def initialize(values)
-		@values = values
+class GameError < Exception
+	def initialize(data)
+		@data = data
 	end
+
+	attr_reader :data
+end
+
+class ValueOver21Error < GameError
 end	
 
-class CannotSplitHandException < Exception
-	def initialize(values)
-		@values = values
-	end
+class CannotSplitError < GameError
+end
+
+class CannotDoubleDownError < GameError
+end
+
+class NoMoreHandsError < GameError
 end
