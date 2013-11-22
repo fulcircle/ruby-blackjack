@@ -8,8 +8,6 @@ Requirements:
 
 Ruby v1.9
 
-Simple implementation of BlackJack in ruby.
-
 House Rules:
 
 * Dealer draws until soft 17 or higher
