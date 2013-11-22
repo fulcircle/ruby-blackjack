@@ -1,7 +1,7 @@
 ruby-blackjack
 ==============
 
-Simple example of blackjack game in ruby
+Simple example of console BlackJack game in ruby
 
 
 Requirements:
