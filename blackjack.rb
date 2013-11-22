@@ -8,10 +8,10 @@ class FrontEnd
 		self.printStatusMsg "Welcome to BlackJack!"
 		numPlayers = prompt "How many players?", "int"
 		@game = Game.new(numPlayers)
-		self.startGame
+		self.runGame
 	end
 
-	def startGame
+	def runGame
 
 		@dealer = @game.dealer
 		@players = @game.players
@@ -91,18 +91,18 @@ class FrontEnd
 		for player in @players
 			amt = nil
 			while true
-				amt = prompt player.to_s + " (Wallet: $" + player.score.to_s + "), place your bet: ", "int"
+				amt = prompt player.to_s + " (Wallet: $" + formatDecimal(player.score) + "), place your bet: ", "int"
 				begin
 					@game.placeBet(player, amt)
 				rescue NoMoneysError => e
 					puts e.message
 					next
 				rescue MinBetError => mbe
-					self.printStatusMsg "You must place the minimum bet of $" + mbe.data[:min_bet].to_s
+					self.printStatusMsg "You must place a minimum bet of $" + formatDecimal(mbe.data[:min_bet])
 					next
 				end
 
-				self.printStatusMsg "You bet $" + amt.to_s
+				self.printStatusMsg "You bet $" + formatDecimal(amt)
 				break
 			end
 		end
@@ -170,7 +170,7 @@ class FrontEnd
 				when "int"
 					val = Integer(gets.chomp)
 					if val <=0
-						self.printStatusMsg "Needs to be positive number"
+						self.printStatusMsg "Value needs to be positive"
 						next
 					end
 				when "string"	
@@ -189,6 +189,10 @@ class FrontEnd
 		puts ""
 		puts msg
 		puts ""
+	end
+
+	def formatDecimal(decimal)
+		return "%.2f" % decimal
 	end
 
 
@@ -215,7 +219,7 @@ class FrontEnd
 
 	def printPlayer(player, round_end=false)
 		puts ""
-		puts player.to_s.upcase + " (Wallet: $" + player.score.to_s + ")"
+		puts player.to_s.upcase + " (Wallet: $" + formatDecimal(player.score) + ")"
 		puts "-----"
 		string = ""
 		player.hands.each_with_index { |hand, i|
@@ -232,7 +236,7 @@ class FrontEnd
 				string += (i+1).to_s
 			end
 
-			string += "(Bet: $" + hand.bet.to_s + ")"
+			string += "(Bet: $" + formatDecimal(hand.bet) + ")"
 			string += ": " + hand.to_s + NEWLINE
 
 		}

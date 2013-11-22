@@ -6,9 +6,7 @@ class Deck
 	@@values = [10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, [1,11]]
 
 	def initialize
-		@cards = Array.new
-		# Build each card and add to cards array
-		@@suites.product(@@ranks).zip(@@values*@@suites.length).each{|x| @cards << Card.new(x[0][1], x[0][0], x[1])}
+		self.newDeck
 	end
 
 	def shuffle
@@ -16,7 +14,11 @@ class Deck
 	end
 
 	def getCard
-		return @cards.pop
+		card = @cards.pop
+		if @cards.length == 0
+			self.newDeck
+		end
+		return card
 	end
 
 	def size
@@ -25,6 +27,12 @@ class Deck
 
 	def to_s
 		@cards
+	end
+
+	def newDeck
+		@cards = Array.new
+		# Build each card and add to cards array
+		@@suites.product(@@ranks).zip(@@values*@@suites.length).each{|x| @cards << Card.new(x[0][1], x[0][0], x[1])}
 	end
 
 	attr_reader :cards

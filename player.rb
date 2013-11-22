@@ -5,7 +5,7 @@ class Player
 		@id = id
 		@name = name.empty? ? "Player" + (@id+1).to_s : name
 		@hands = [PlayerHand.new]
-		@score = 1000
+		@score = 1000.00
 	end
 
 	def addHand

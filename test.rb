@@ -331,3 +331,17 @@ class TestPlayerHand < Test::Unit::TestCase
 	end
 
 end
+
+class TestDeck < Test::Unit::TestCase
+
+	def test_deck_created_after_cards_finished
+		deck = Deck.new
+		deck.cards.clear
+		deck.cards << Card.new("King", "Diamonds", 10)
+		assert_equal(1, deck.size)
+
+		deck.getCard
+		assert_equal(52, deck.size)
+
+	end
+end
