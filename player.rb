@@ -6,16 +6,14 @@ class Player
 		@name = name.empty? ? "Player" + (@id+1).to_s : name
 		@hands = [PlayerHand.new]
 		@score = 1000
-		@isDoublingDown = false
 	end
 
 	def addHand
 		@hands << PlayerHand.new
 	end
 
-	def doubleDown
-		@hands.first.bet *= 2
-		@isDoublingDown = true
+	def isDoubledDown?
+		return @hands.any? {|hand| hand.isDoubledDown}
 	end
 
 	def numHands
@@ -24,6 +22,11 @@ class Player
 
 	def to_s
 		return @name
+	end
+
+	def clearHands
+		@hands.clear
+		@hands = [PlayerHand.new]
 	end
 
 

@@ -1,4 +1,4 @@
-class GameError < Exception
+class GameException < Exception
 	def initialize(data)
 		@data = data
 	end
@@ -6,20 +6,26 @@ class GameError < Exception
 	attr_reader :data
 end
 
-class ValueOver21Error < GameError
+class PlayerLostHandException < GameException
 end	
 
-class CannotSplitError < GameError
+class CannotSplitError < GameException
 end
 
-class CannotDoubleDownError < GameError
+class CannotDoubleDownError < GameException
 end
 
-class NoMoreHandsError < GameError
+class MinBetError < GameException
 end
 
-class MinBetError < GameError
+class NoMoneysError < GameException
 end
 
-class NoMoneysError < GameError
+class PlayerStayException < GameException
+end
+
+class PlayerSplitException < GameException
+end
+
+class PlayerDoubleDownException < GameException
 end

@@ -6,6 +6,7 @@ class PlayerHand
 		@cards = Array.new
 		@possibleValues = Set.new [0]
 		@bet = 0
+		@isDoubledDown = false
 	end
 
 	def add(card)
@@ -16,6 +17,22 @@ class PlayerHand
 	def remove(card)
 		@cards.delete(card)
 		@possibleValues = self.calculatePossibleVals
+	end
+
+	def blackjack?
+		return @possibleValues.any? {|x| x == 21}
+	end
+
+	def >(other_hand)
+		return self.possibleValues.max > other_hand.possibleValues.max
+	end
+
+	def <(other_hand)
+		return self.possibleValues.max < other_hand.possibleValues.max
+	end
+
+	def ==(other_hand)
+		return self.possibleValues.max == other_hand.possibleValues.max
 	end
 
 	def calculatePossibleVals
@@ -43,4 +60,6 @@ class PlayerHand
 	attr_reader :possibleValues
 	attr_reader :cards
 	attr_accessor :bet
+	attr_accessor :lost
+	attr_accessor :isDoubledDown
 end
