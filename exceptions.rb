@@ -29,3 +29,9 @@ end
 
 class PlayerDoubleDownException < GameException
 end
+
+class HandDoubledDownException < GameException
+end
+
+class PlayerHit21Exception < GameException
+end

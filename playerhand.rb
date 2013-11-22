@@ -7,6 +7,7 @@ class PlayerHand
 		@possibleValues = Set.new [0]
 		@bet = 0
 		@isDoubledDown = false
+		@blackjack = false
 	end
 
 	def add(card)
@@ -19,20 +20,43 @@ class PlayerHand
 		@possibleValues = self.calculatePossibleVals
 	end
 
-	def blackjack?
-		return @possibleValues.any? {|x| x == 21}
-	end
-
 	def >(other_hand)
-		return self.possibleValues.max > other_hand.possibleValues.max
+		selfFilteredVals = self.possibleValues.select{|val| val<=21}
+		otherFilteredVals = other_hand.possibleValues.select{|val| val<=21}
+		if selfFilteredVals.length == 0 and otherFilteredVals.length >= 0
+			return false
+		elsif selfFilteredVals.length > 0 and otherFilteredVals.length == 0
+			return true
+		else 
+			return selfFilteredVals.max > otherFilteredVals.max
+		end
 	end
 
 	def <(other_hand)
-		return self.possibleValues.max < other_hand.possibleValues.max
+		selfFilteredVals = self.possibleValues.select{|val| val<=21}
+		otherFilteredVals = other_hand.possibleValues.select{|val| val<=21}
+
+		if selfFilteredVals.length >= 0 and otherFilteredVals.length == 0
+			return false
+		elsif selfFilteredVals.length == 0 and otherFilteredVals.length > 0
+			return true
+		else 
+			return selfFilteredVals.max < otherFilteredVals.max
+		end
 	end
 
 	def ==(other_hand)
-		return self.possibleValues.max == other_hand.possibleValues.max
+		selfFilteredVals = self.possibleValues.select{|val| val<=21}
+		otherFilteredVals = other_hand.possibleValues.select{|val| val<=21}
+		if selfFilteredVals.length == 0 and otherFilteredVals.length == 0
+			return true
+		elsif selfFilteredVals.length > 0 and otherFilteredVals.length == 0
+			return false
+		elsif selfFilteredVals.length == 0 and otherFilteredVals.length > 0	
+			return false
+		else
+			return selfFilteredVals.max == otherFilteredVals.max
+		end
 	end
 
 	def calculatePossibleVals
@@ -50,7 +74,20 @@ class PlayerHand
 	end
 
 	def to_s
-		return @cards.to_s
+		string = ""
+		for card in @cards	
+			string += card.to_s + " "
+		end
+		unless @cards.any? {|x| x.hidden}
+			string += "("
+			possibleValues.each_with_index {
+								|val, i| 
+								string += val.to_s
+								i == possibleValues.length-1 ? string += "" : string += ","
+							}
+			string += ")"
+		end
+		return string
 	end
 
 	def size
@@ -62,4 +99,5 @@ class PlayerHand
 	attr_accessor :bet
 	attr_accessor :lost
 	attr_accessor :isDoubledDown
+	attr_accessor :blackjack
 end

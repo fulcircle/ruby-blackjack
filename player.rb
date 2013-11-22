@@ -12,9 +12,10 @@ class Player
 		@hands << PlayerHand.new
 	end
 
-	def isDoubledDown?
+	def isDoubledDown
 		return @hands.any? {|hand| hand.isDoubledDown}
 	end
+
 
 	def numHands
 		return @hands.length
