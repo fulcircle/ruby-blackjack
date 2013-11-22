@@ -3,6 +3,10 @@ ruby-blackjack
 
 Simple example of console BlackJack game in ruby
 
+To run:
+
+<code>ruby blackjack.rb</code>
+
 
 Requirements:
 
