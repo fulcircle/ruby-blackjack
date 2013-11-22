@@ -1,7 +1,7 @@
 require_relative "game"
 require_relative "exceptions"
 
-class FrontEnd
+class BlackJack
 	NEWLINE = "\n"
 
 	def initialize
@@ -246,4 +246,4 @@ class FrontEnd
 	end
 end
 
-f = FrontEnd.new
+f = BlackJack.new
